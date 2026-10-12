@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/*
+ * BettingValue design tokens.
+ * Dark, terminal-style palette. Surfaces step up in lightness; borders are hairlines.
+ * Chart series colours are validated for colour-vision deficiency against --color-surface.
+ */
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "Consolas", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-canvas: #090c11;
+  --color-surface: #11161d;
+  --color-surface-2: #161c25;
+  --color-surface-3: #1c2330;
+  --color-line: #232b37;
+  --color-line-strong: #2f3947;
+
+  --color-ink: #e7eaf0;
+  --color-ink-2: #aab3c2;
+  --color-ink-3: #758094;
+
+  --color-accent: #4d8ff0;
+  --color-accent-strong: #3987e5;
+  --color-accent-soft: rgb(77 143 240 / 0.12);
+
+  --color-pos: #2bb673;
+  --color-pos-soft: rgb(43 182 115 / 0.12);
+  --color-neg: #e5534b;
+  --color-neg-soft: rgb(229 83 75 / 0.12);
+  --color-warn: #e0a526;
+  --color-warn-soft: rgb(224 165 38 / 0.12);
+
+  /* Categorical chart series (dark-mode steps, validated) */
+  --color-series-1: #3987e5;
+  --color-series-2: #d95926;
+  --color-series-3: #199e70;
+  --color-series-4: #c98500;
+
+  --color-grid: #1f2732;
+  --color-axis: #2f3947;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgb(77 143 240 / 0.35);
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Grid children may shrink below their content (wide tables scroll inside their card instead of widening the page). */
+  .grid > * {
+    min-width: 0;
+  }
+
+  /* Slim scrollbars for dense tables */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
