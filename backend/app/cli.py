@@ -83,6 +83,17 @@ def cmd_runs(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_doctor(args: argparse.Namespace) -> int:
+    from app.doctor import run_doctor
+
+    return run_doctor(
+        get_settings(),
+        api_url=None if args.no_api else args.api_url,
+        frontend_url=None if args.no_frontend else args.frontend_url,
+        odds_api=args.odds_api,
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     configure_logging(logging.WARNING)
     parser = argparse.ArgumentParser(prog="python -m app.cli", description="BettingValue backend tasks")
@@ -115,6 +126,16 @@ def main(argv: list[str] | None = None) -> int:
     runs = sub.add_parser("runs", help="Show recent provider sync runs")
     runs.add_argument("--limit", type=int, default=15)
     runs.set_defaults(func=cmd_runs)
+
+    doctor = sub.add_parser(
+        "doctor", help="Check config, database, migrations, API, frontend (secrets masked)"
+    )
+    doctor.add_argument("--api-url", default="http://localhost:8000")
+    doctor.add_argument("--frontend-url", default="http://localhost:3000")
+    doctor.add_argument("--no-api", action="store_true", help="Skip API checks (backend not started yet)")
+    doctor.add_argument("--no-frontend", action="store_true", help="Skip frontend checks")
+    doctor.add_argument("--odds-api", action="store_true", help="Validate ODDS_API_KEY (free /sports call)")
+    doctor.set_defaults(func=cmd_doctor)
 
     args = parser.parse_args(argv)
     try:

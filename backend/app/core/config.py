@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -30,6 +30,15 @@ class Settings(BaseSettings):
     value_min_books: int = Field(
         default=3, ge=2, description="Bookmakers required for a consensus fair price"
     )
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, value: str) -> str:
+        """Accept URLs as copied from Neon/Supabase/psql (postgres:// or postgresql://) and pin psycopg 3."""
+        for prefix in ("postgres://", "postgresql://"):
+            if value.startswith(prefix):
+                return "postgresql+psycopg://" + value[len(prefix) :]
+        return value
 
     @property
     def cors_origin_list(self) -> list[str]:

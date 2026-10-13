@@ -61,3 +61,13 @@ def test_model_method_uses_stored_probability_only() -> None:
     results, _ = evaluate_market(market, method="model")
     assert [r.selection_id for r in results] == [1]
     assert results[0].ev == pytest.approx(0.1)
+
+
+def test_database_url_accepts_provider_formats() -> None:
+    from app.core.config import Settings
+
+    neon = "postgresql://u:p@ep-x.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    assert Settings(database_url=neon).database_url.startswith("postgresql+psycopg://u:p@ep-x.")
+    assert Settings(database_url="postgres://u:p@h/db").database_url == "postgresql+psycopg://u:p@h/db"
+    explicit = "postgresql+psycopg://u:p@h/db"
+    assert Settings(database_url=explicit).database_url == explicit

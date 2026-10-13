@@ -100,7 +100,50 @@ Every odds response includes `meta.sources`. A value of `demo` means synthetic d
 
 The live adapter is tested against a hand-written payload in the documented v4 format (`tests/fixtures/the_odds_api_sample.json`) with mocked HTTP. **It has not been run against the live service in this environment (no API key).** Run a small sync with your key and check `python -m app.cli runs` before relying on it.
 
-## Running locally on Windows
+## Windows: scripted setup (recommended)
+
+Run these from the repository root (`C:\Projects\BettingValue`) in PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\windows\setup.ps1   # once, and after pulling changes
+powershell -ExecutionPolicy Bypass -File scripts\windows\start.ps1   # starts API + web, verifies, opens the dashboard
+powershell -ExecutionPolicy Bypass -File scripts\windows\stop.ps1    # stops whatever listens on ports 8000/3000
+```
+
+What `setup.ps1` does:
+
+| Step | Details |
+|---|---|
+| Tools | Installs missing tools with winget: Python 3.13, uv, Node.js LTS (`-SkipInstall` to skip). |
+| Config | Prompts, with hidden input, for the PostgreSQL/Neon connection string and an optional The Odds API key. You can also pass them as `$env:BV_DATABASE_URL` / `$env:BV_ODDS_API_KEY`. |
+| `.env` safety | Only adds missing keys to `backend\.env` and `.env.local`. Existing values, such as API-Football keys, are kept. A single changed line (`DATA_SOURCE`) is backed up first to `*.bak-<timestamp>`. Refuses to continue if either file is not Git-ignored. |
+| Git | Read-only: it reports the branch, stash count and uncommitted changes, but never checks out, stashes or resets anything. If Phase 2 is missing from the checkout, it suggests a separate `git worktree` instead of switching branches. |
+| Database | `alembic upgrade head` only (non-destructive). |
+| Data | Real odds via `sync --leagues soccer_epl` when an API key is set, otherwise synthetic demo odds. |
+| Frontend | `npm ci` if needed, then `npm run build`. |
+
+`start.ps1` opens each server in its own window, waits for both, then runs the doctor.
+
+### Health check (`doctor`)
+
+```powershell
+cd backend
+uv run python -m app.cli doctor --odds-api        # add --no-api / --no-frontend before servers run
+```
+
+It checks, without ever printing passwords or keys:
+- configuration and PostgreSQL version (15+);
+- migration status;
+- stored fixtures split into real and synthetic;
+- recent sync runs and every important API endpoint;
+- that the dashboard renders a backend fixture (team and league names), so it is really reading the API;
+- that The Odds API key is valid, using the free `/sports` call.
+
+It exits non-zero when any check fails.
+
+> **Important:** `DATA_SOURCE` is applied when the Next.js app is **built**. In mock mode the data pages are prerendered statically, so a build made with `DATA_SOURCE=mock` keeps serving demo pages even if you later start it with `api`. After changing `.env.local`, run `npm run build` again (setup.ps1 does this). `npm run dev` always reads the current value.
+
+## Running locally on Windows (manual steps)
 
 Requirements:
 - **Python:** 3.11+ (3.12 or 3.13 recommended).
@@ -115,7 +158,7 @@ psql -U postgres -c "CREATE DATABASE bettingvalue OWNER bettingvalue;"
 psql -U postgres -c "CREATE DATABASE bettingvalue_test OWNER bettingvalue;"   # only for running tests
 ```
 
-**Option B (no local service).** Use a hosted PostgreSQL (for example Neon or Supabase free tiers) and put its connection string in `DATABASE_URL`, using the `postgresql+psycopg://` scheme.
+**Option B (no local service).** Use a hosted PostgreSQL (for example Neon or Supabase free tiers) and paste its connection string into `DATABASE_URL` as given (`postgresql://…?sslmode=require` is accepted and switched to the psycopg driver automatically).
 
 Then:
 
