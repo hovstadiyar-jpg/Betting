@@ -75,7 +75,7 @@ export function ValueTable({ rows, matches, reference, maxRows, compact = false 
     },
     {
       key: "prob",
-      header: "Model",
+      header: "Fair %",
       align: "right",
       hideBelow: compact ? "lg" : "md",
       sortValue: (v) => v.modelProbability,

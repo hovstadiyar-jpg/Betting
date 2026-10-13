@@ -137,7 +137,7 @@ function buildPlayers(rng: Rng, teams: Team[]) {
   const playerMeans = new Map<string, MarketMeans>();
 
   for (const team of teams) {
-    for (const template of POSITIONS[team.sportId]) {
+    for (const template of POSITIONS[team.sportId] ?? []) {
       let name = "";
       do {
         name = `${pick(rng, FIRST_NAMES)} ${pick(rng, LAST_NAMES)}`;

@@ -465,7 +465,7 @@ function buildTeamProps(rng: Rng, ref: ReferenceSet, matches: Match[]): TeamProp
       const team = teamById.get(teamId);
       const opponent = teamById.get(opponentId);
       if (!team || !opponent) continue;
-      for (const { market, mean: meanFn } of TEAM_PROP_MARKETS[match.sportId]) {
+      for (const { market, mean: meanFn } of TEAM_PROP_MARKETS[match.sportId] ?? []) {
         const mean = Math.max(0.4, meanFn(team));
         const projection = mean * (1 + (team.rating - opponent.rating) / 400) * (1 + normal(rng, 0, 0.03));
         const core = priceProp(rng, mean, projection);

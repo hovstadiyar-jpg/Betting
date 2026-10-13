@@ -40,7 +40,7 @@ export function OddsComparisonTable({ market, bookmakers }: OddsComparisonTableP
               Fair
             </th>
             <th scope="col" className="px-3 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-ink-3">
-              Model
+              Fair %
             </th>
             <th scope="col" className="px-3 py-2 text-right text-[11px] font-medium uppercase tracking-wider text-ink-3">
               EV @ best

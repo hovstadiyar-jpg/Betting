@@ -11,9 +11,11 @@ interface SidebarProps {
   /** Mobile drawer state; ignored on large screens where the sidebar is always visible. */
   open: boolean;
   onClose: () => void;
+  dataMode: "mock" | "api";
+  liveOdds: boolean;
 }
 
-export function Sidebar({ open, onClose }: SidebarProps) {
+export function Sidebar({ open, onClose, dataMode, liveOdds }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -77,10 +79,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         <div className="border-t border-line p-3">
           <div className="rounded-md border border-line bg-surface p-3">
             <div className="flex items-center gap-2 text-xs font-medium text-ink">
-              <FlaskConical className="size-3.5 text-warn" /> Phase 1 preview
+              <FlaskConical className="size-3.5 text-warn" /> Preview build
             </div>
             <p className="mt-1 text-[11px] leading-4 text-ink-3">
-              Synthetic data only. No bookmaker feeds, accounts or payments are connected.
+              {dataMode === "api"
+                ? `Odds: ${liveOdds ? "live provider feed" : "backend (demo feed)"}. Player stats, trends and backtests: demo data. No accounts or payments.`
+                : "Synthetic data only. No bookmaker feeds, accounts or payments are connected."}
             </p>
           </div>
         </div>

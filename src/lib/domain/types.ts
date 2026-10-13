@@ -1,12 +1,13 @@
 /**
  * Core domain types for BettingValue.
  *
- * These types are the contract between the UI and the data layer. The Phase 1
- * mock provider produces them from synthetic generators; a future FastAPI
- * backend is expected to return the same shapes (see src/lib/api/provider.ts).
+ * These types are the contract between the UI and the data layer. The mock
+ * provider produces them from synthetic generators; the HTTP provider maps the
+ * FastAPI backend's responses onto them (see src/lib/api/http-provider.ts).
  */
 
-export type SportId = "football" | "basketball" | "ice-hockey";
+/** Known demo sports plus any sport key the backend reports (e.g. "american-football"). */
+export type SportId = "football" | "basketball" | "ice-hockey" | (string & {});
 
 export interface Sport {
   id: SportId;
@@ -72,7 +73,7 @@ export interface Match {
 }
 
 /** Market families available across the platform. */
-export type MarketType = "match-result" | "moneyline" | "total" | "handicap" | "btts";
+export type MarketType = "match-result" | "moneyline" | "total" | "handicap" | "btts" | "player-prop" | "team-prop";
 
 export interface OddsQuote {
   bookmakerId: string;
@@ -228,7 +229,7 @@ export interface HistoricalBet {
   date: string;
   sportId: SportId;
   leagueId: string;
-  marketType: MarketType | "player-prop" | "team-prop";
+  marketType: MarketType;
   selection: string;
   odds: number;
   closingOdds: number;
@@ -276,10 +277,10 @@ export interface DashboardSummary {
   matchesTracked: number;
   bookmakersTracked: number;
   propsTracked: number;
-  /** Synthetic model calibration headline. */
-  modelBrierScore: number;
-  /** EV opportunity count per hour, oldest first. */
-  opportunitiesTrend: number[];
+  /** Model calibration headline; absent when no model is deployed. */
+  modelBrierScore?: number;
+  /** EV opportunity count per hour, oldest first; absent when not tracked. */
+  opportunitiesTrend?: number[];
 }
 
 export interface SearchEntry {

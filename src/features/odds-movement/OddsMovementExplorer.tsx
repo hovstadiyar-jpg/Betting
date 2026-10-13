@@ -83,7 +83,7 @@ export function OddsMovementExplorer({ movements, matches, reference }: OddsMove
         </div>
       ),
     },
-    { key: "book", header: "Book", render: (m) => <span className="text-xs">{lookup.bookmakerName(m.bookmakerId)}</span>, hideBelow: "lg" },
+    { key: "book", header: "Book", render: (m) => <span className="text-xs">{lookup.bookmakerName(m.bookmakerId)}</span>, hideBelow: "2xl" },
     { key: "open", header: "Open", align: "right", sortValue: (m) => m.openingOdds, render: (m) => <span className="font-mono tabular text-ink-3">{formatOdds(m.openingOdds)}</span>, hideBelow: "sm" },
     { key: "now", header: "Now", align: "right", sortValue: (m) => m.currentOdds, render: (m) => <span className="font-mono font-semibold tabular text-ink">{formatOdds(m.currentOdds)}</span> },
     { key: "shift", header: "Implied shift", align: "right", sortValue: (m) => m.impliedShift, render: (m) => <ShiftCell shift={m.impliedShift} /> },

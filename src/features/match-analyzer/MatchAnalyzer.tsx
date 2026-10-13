@@ -127,7 +127,7 @@ export function MatchAnalyzer({ reference, matches, markets, opportunities, team
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div>
-              <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-ink-3">Model probability</div>
+              <div className="mb-2 text-[11px] font-medium uppercase tracking-wider text-ink-3">Fair probability</div>
               <ProbabilityBar parts={modelParts.map((x) => ({ ...x, p: x.p / modelTotal }))} />
             </div>
             <div>
@@ -220,6 +220,9 @@ export function MatchAnalyzer({ reference, matches, markets, opportunities, team
                 </Link>
               }
             />
+            {props.length === 0 ? (
+              <EmptyState title="No prop analysis for this fixture" message="Player stats and projections are not available for this fixture yet." />
+            ) : null}
             <ul>
               {props.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-3 border-b border-line/70 px-4 py-2 last:border-0">

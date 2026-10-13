@@ -1,0 +1,55 @@
+[project]
+name = "bettingvalue-backend"
+version = "0.2.0"
+description = "BettingValue API: odds ingestion, value calculations and analytics (Phase 2)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.143,<0.144",
+    "uvicorn>=0.54,<0.55",
+    "pydantic>=2.14,<3",
+    "pydantic-settings>=2.15,<3",
+    "sqlalchemy>=2.1,<2.2",
+    "alembic>=1.20,<2",
+    "psycopg[binary]>=3.3,<4",
+    "httpx>=0.28,<0.29",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1,<10",
+    "ruff>=0.17,<0.18",
+    "mypy>=2.4,<3",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+exclude = ["alembic/"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    # Upstream Starlette/FastAPI deprecation about the test client's HTTP library; not actionable here.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { api } from "@/lib/api";
-import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { DemoDataBanner } from "@/components/ui/DemoDataBanner";
+import { SourceBadge, SourceBanner } from "@/components/ui/SourceNotice";
 import { FreshnessIndicator } from "@/components/data/FreshnessIndicator";
 import { MatchAnalyzer } from "@/features/match-analyzer/MatchAnalyzer";
 
@@ -31,12 +30,12 @@ export default async function MatchAnalyzerPage({ searchParams }: PageProps) {
         description="One fixture, every angle: model vs market probabilities, full odds comparison, form and the props worth a closer look."
         eyebrow={
           <>
-            <Badge tone="warning">Demo data</Badge>
+            <SourceBadge metas={[markets.meta, matches.meta]} />
             <FreshnessIndicator meta={markets.meta} />
           </>
         }
       />
-      <DemoDataBanner />
+      <SourceBanner metas={[markets.meta, matches.meta]} />
       <MatchAnalyzer
         key={matchId ?? "default"}
         reference={reference}

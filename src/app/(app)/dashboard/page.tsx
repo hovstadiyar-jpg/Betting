@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatTile } from "@/components/ui/StatTile";
-import { DemoDataBanner } from "@/components/ui/DemoDataBanner";
+import { SourceBadge, SourceBanner } from "@/components/ui/SourceNotice";
 import { FreshnessIndicator } from "@/components/data/FreshnessIndicator";
 import { MatchTable } from "@/components/data/MatchTable";
 import { ValueTable } from "@/components/data/ValueTable";
@@ -62,6 +62,7 @@ export default async function DashboardPage() {
     value: value.data.filter((v) => v.ev > b.min && v.ev <= b.max).length,
   }));
   const topTrends = trends.data.filter((t) => t.kind === "player").slice(0, 3);
+  const oddsMetas = [summary.meta, matches.meta, markets.meta, value.meta, movements.meta];
 
   return (
     <div className="space-y-5">
@@ -70,7 +71,7 @@ export default async function DashboardPage() {
         description="Where model prices and bookmaker prices disagree right now, across every tracked league."
         eyebrow={
           <>
-            <Badge tone="warning">Demo data</Badge>
+            <SourceBadge metas={oddsMetas} />
             <FreshnessIndicator meta={summary.meta} />
           </>
         }
@@ -81,7 +82,7 @@ export default async function DashboardPage() {
         }
       />
 
-      <DemoDataBanner />
+      <SourceBanner metas={oddsMetas} />
 
       <section aria-label="Key metrics" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile
@@ -89,7 +90,8 @@ export default async function DashboardPage() {
           value={s.valueBetsCount}
           icon={<Radar className="size-4" />}
           trend={s.opportunitiesTrend}
-          delta={opportunityDelta(s.opportunitiesTrend)}
+          delta={s.opportunitiesTrend ? opportunityDelta(s.opportunitiesTrend) : undefined}
+          hint={s.opportunitiesTrend ? undefined : `${s.matchesTracked} upcoming fixtures scanned`}
         />
         <StatTile label="Average EV" value={formatSignedPct(s.averageEv)} icon={<Gauge className="size-4" />} hint={`Top opportunity ${formatSignedPct(s.topEv)}`} />
         <StatTile
@@ -102,7 +104,7 @@ export default async function DashboardPage() {
           label="Props tracked"
           value={s.propsTracked}
           icon={<Target className="size-4" />}
-          hint={`Model Brier score ${s.modelBrierScore.toFixed(3)}`}
+          hint={s.modelBrierScore !== undefined ? `Model Brier score ${s.modelBrierScore.toFixed(3)}` : "Player and team props"}
         />
       </section>
 
@@ -165,7 +167,8 @@ export default async function DashboardPage() {
         <section aria-labelledby="trends-heading" className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 id="trends-heading" className="text-[13px] font-semibold text-ink">
-              Statistical trends
+              Statistical trends{" "}
+              {trends.meta.source === "synthetic" ? <Badge tone="warning">Demo stats</Badge> : null}
             </h2>
             <Link href="/props-lab" className="text-xs text-accent hover:underline">
               Trend Explorer

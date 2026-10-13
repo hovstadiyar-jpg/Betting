@@ -1,0 +1,90 @@
+[
+  {
+    "id": "sample-event-0001",
+    "sport_key": "soccer_epl",
+    "sport_title": "EPL",
+    "commence_time": "2099-01-10T15:00:00Z",
+    "home_team": "Home United",
+    "away_team": "Away City",
+    "bookmakers": [
+      {
+        "key": "book_alpha",
+        "title": "Book Alpha",
+        "last_update": "2099-01-09T10:00:00Z",
+        "markets": [
+          {"key": "h2h", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Home United", "price": 2.10}, {"name": "Away City", "price": 3.60}, {"name": "Draw", "price": 3.40}]},
+          {"key": "totals", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Over", "price": 1.90, "point": 2.5}, {"name": "Under", "price": 1.95, "point": 2.5}]},
+          {"key": "spreads", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Home United", "price": 1.95, "point": -0.5}, {"name": "Away City", "price": 1.90, "point": 0.5}]}
+        ]
+      },
+      {
+        "key": "book_beta",
+        "title": "Book Beta",
+        "last_update": "2099-01-09T10:05:00Z",
+        "markets": [
+          {"key": "h2h", "last_update": "2099-01-09T10:05:00Z", "outcomes": [
+            {"name": "Home United", "price": 2.05}, {"name": "Away City", "price": 3.70}, {"name": "Draw", "price": 3.50}]},
+          {"key": "totals", "last_update": "2099-01-09T10:05:00Z", "outcomes": [
+            {"name": "Over", "price": 1.88, "point": 2.5}, {"name": "Under", "price": 1.97, "point": 2.5}]}
+        ]
+      },
+      {
+        "key": "book_gamma",
+        "title": "Book Gamma",
+        "last_update": "2099-01-09T10:02:00Z",
+        "markets": [
+          {"key": "h2h", "last_update": "2099-01-09T10:02:00Z", "outcomes": [
+            {"name": "Home United", "price": 2.00}, {"name": "Away City", "price": 3.80}, {"name": "Draw", "price": 3.45}]},
+          {"key": "totals", "last_update": "2099-01-09T10:02:00Z", "outcomes": [
+            {"name": "Over", "price": 2.10, "point": 3.0}, {"name": "Under", "price": 1.75, "point": 3.0}]}
+        ]
+      },
+      {
+        "key": "book_delta",
+        "title": "Book Delta",
+        "last_update": "2099-01-09T10:04:00Z",
+        "markets": [
+          {"key": "h2h", "last_update": "2099-01-09T10:04:00Z", "outcomes": [
+            {"name": "Home United", "price": 2.25}, {"name": "Away City", "price": 3.30}, {"name": "Draw", "price": 3.30}]}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sample-event-0002",
+    "sport_key": "basketball_nba",
+    "sport_title": "NBA",
+    "commence_time": "2099-01-11T00:30:00Z",
+    "home_team": "Lake Hawks",
+    "away_team": "Bay Comets",
+    "bookmakers": [
+      {
+        "key": "book_alpha",
+        "title": "Book Alpha",
+        "last_update": "2099-01-09T10:00:00Z",
+        "markets": [
+          {"key": "h2h", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Lake Hawks", "price": 1.60}, {"name": "Bay Comets", "price": 2.40}]},
+          {"key": "player_points", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Over", "description": "Sam Rivers", "price": 1.87, "point": 24.5},
+            {"name": "Under", "description": "Sam Rivers", "price": 1.93, "point": 24.5}]},
+          {"key": "team_totals", "last_update": "2099-01-09T10:00:00Z", "outcomes": [
+            {"name": "Over", "description": "Lake Hawks", "price": 1.91, "point": 112.5},
+            {"name": "Under", "description": "Lake Hawks", "price": 1.89, "point": 112.5}]}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sample-outright",
+    "sport_key": "soccer_epl_winner",
+    "sport_title": "EPL Winner",
+    "commence_time": "2099-05-20T15:00:00Z",
+    "home_team": null,
+    "away_team": null,
+    "bookmakers": []
+  }
+]

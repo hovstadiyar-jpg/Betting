@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { api } from "@/lib/api";
-import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { DemoDataBanner } from "@/components/ui/DemoDataBanner";
+import { SourceBadge, SourceBanner } from "@/components/ui/SourceNotice";
 import { FreshnessIndicator } from "@/components/data/FreshnessIndicator";
 import { OddsMovementExplorer } from "@/features/odds-movement/OddsMovementExplorer";
 
@@ -18,12 +17,12 @@ export default async function OddsMovementPage() {
         description="How prices have moved over the last 48 hours: shortening, drifting and sharp steam moves across markets and props."
         eyebrow={
           <>
-            <Badge tone="warning">Demo data</Badge>
+            <SourceBadge metas={[movements.meta, matches.meta]} />
             <FreshnessIndicator meta={movements.meta} />
           </>
         }
       />
-      <DemoDataBanner />
+      <SourceBanner metas={[movements.meta, matches.meta]} />
       <OddsMovementExplorer movements={movements.data} matches={matches.data} reference={reference} />
     </div>
   );

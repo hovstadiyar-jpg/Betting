@@ -2,8 +2,11 @@
 
 Sports betting analytics platform: bookmaker odds comparison, expected value (EV), player and team props, statistical trends, and a dedicated Props Lab.
 
-> **Status: Phase 1 frontend preview. Not production-ready.**
-> Every number in the app is **synthetic demonstration data** produced by a seeded random generator. No bookmaker, odds provider or sports-data feed is connected. That includes Bet365: BettingValue is not affiliated with Bet365, and the Props Lab does not show Bet365 data. There are no accounts, no payments and no betting transactions.
+> **Status: Phase 2 development preview. Not production-ready.**
+> - **Default mode** (`DATA_SOURCE` unset): every number is **synthetic demonstration data**, exactly as in Phase 1.
+> - **API mode** (`DATA_SOURCE=api`): odds, fixtures, value bets and line movement come from the FastAPI + PostgreSQL backend in [`backend/`](backend/README.md). That backend is fed by either a synthetic demo provider or The Odds API (with your own key). Player stats, trends, matchups, team form and backtest history remain synthetic, and every dataset is labelled with its source.
+> - **Bet365:** BettingValue is not affiliated with Bet365, and the Props Lab does not show Bet365 data.
+> - **Out of scope:** there are no accounts, no payments and no betting transactions.
 
 ---
 
@@ -118,13 +121,22 @@ src/
 3. **Domain logic is pure.** EV, implied probability, no-vig, hit rates, CLV and the backtest engine live in `lib/domain/` with no framework imports, so they can be unit-tested and mirrored in Python later.
 4. **Deterministic demo data.** The generators use a fixed seed and a fixed "now" (12 Oct 2026, 12:00 UTC), so server and client renders match and screenshots are reproducible.
 
-### Planned FastAPI / PostgreSQL integration (not implemented)
+### Backend integration (Phase 2)
 
-1. Build a FastAPI service whose response models mirror `src/lib/domain/types.ts` (consider generating the TS types from its OpenAPI schema).
-2. Add `src/lib/api/http-provider.ts` that implements `DataProvider` with `fetch(`${API_BASE_URL}/…`)`, plus Next.js caching / revalidation per dataset.
-3. Switch `src/lib/api/index.ts` on an env var (`DATA_SOURCE=mock|api`). No page or component changes should be needed.
-4. Move filtering and paging server-side for large datasets. Phase 1 filters in the browser, which is fine for a few hundred rows. The Props Lab page is around 110 KB gzipped today.
-5. Add real auth (e.g. Auth.js or the FastAPI service) behind the existing `/login` and `/register` forms.
+| Setting (`.env.local`) | Effect |
+|---|---|
+| `DATA_SOURCE=mock` (default) | Fully synthetic, no backend needed. Data pages are statically prerendered. |
+| `DATA_SOURCE=api` | `src/lib/api/http-provider.ts` reads fixtures, markets, value bets, movements and reference data from `API_BASE_URL` (default `http://localhost:8000`), server-side only. Synthetic datasets still come from the mock provider. Data pages render per request. |
+
+- **Composition:** the composite provider lives in `src/lib/api/index.ts`. Pages and components are unchanged apart from source-aware labels (`SourceBadge` / `SourceBanner`).
+- **Labelling:** a page shows "Live odds" only when every odds dataset on it comes from a non-demo source.
+- **Backend outages:** if the backend is unreachable, the shell still renders, the top bar shows "Odds feed unavailable", and the page shows a retry message (`src/app/(app)/error.tsx`).
+- **Backend setup:** see [`backend/README.md`](backend/README.md).
+
+Next steps:
+1. Server-side filtering and paging for large real datasets.
+2. Real auth behind the existing `/login` and `/register` forms.
+3. Generating TS types from the backend's OpenAPI schema.
 
 ---
 
@@ -162,10 +174,39 @@ src/
 - Server-side pagination and URL-persisted filters (only Match/Player/Team selection is kept in the URL)
 - Light theme and internationalisation (dates are shown in UTC)
 
+## Phase 2 summary
+
+### Completed
+
+- **Assessment:** inspected the project, re-ran the Phase 1 checks (all passing) and audited dependencies (see "Dependency audit" below).
+- **Backend:** `backend/` is a FastAPI service with a modular layout (config, db, models, schemas, repositories, services, providers, ingestion, routes, CLI).
+- **Endpoints:** health and readiness, sports, leagues, teams, players, bookmakers, fixtures, per-fixture odds, bulk odds, player props, team props, value bets, odds history, odds movements and sync runs. All have Pydantic response models and automatic OpenAPI docs at `/docs`.
+- **PostgreSQL schema:** sports, leagues, teams, players, fixtures, bookmakers, markets, selections, odds observations (append-only), current odds, provider sync runs and external ID mappings. Managed with Alembic migrations, CHECK constraints and indexes.
+- **Odds integration:** a provider abstraction with a The Odds API adapter (quota tracking, no key leakage in errors) and a deterministic demo provider. Ingestion is idempotent and only appends history when a price changes.
+- **Value bets:** a no-vig consensus method, with a staleness cutoff so withdrawn prices are ignored.
+- **Frontend wiring:** opt-in HTTP provider, source-aware labels and graceful backend-outage handling.
+- **Tests:** 26 backend tests run against real PostgreSQL. They cover the maths, adapter mapping, mocked HTTP, ingestion idempotency, failure auditing and every endpoint.
+- **Quality gates:** ruff and mypy `--strict` pass. Frontend typecheck, lint and build pass in both data modes.
+
+### Not done / known gaps
+
+- **Live adapter untested against the real service:** The Odds API adapter has only been tested against a documented-format sample with mocked HTTP. It needs a real API key to verify.
+- **No Bet365 data:** no licensed Bet365 source exists in this project, so the Props Lab stays synthetic.
+- **Still synthetic in API mode:** player and team statistics, trends, matchups, team form and backtest history (no stats provider yet).
+- **Platform features missing:** no authentication, API rate limiting, scheduler process, deployment configuration or monitoring.
+- **No frontend tests:** there are no frontend unit or E2E tests. The UI was verified with scripted browser runs.
+
+### Dependency audit
+
+- **Phase 2 update:** `lucide-react` 1.55 → 1.56 (minor).
+- **Held back on purpose:** TypeScript 7 (new native compiler, not yet the Next.js default), ESLint 10 (plugin compatibility) and `@types/node` 26 (Node 22 is the target).
+- **Open advisory:** `npm audit` reports 5 high-severity findings, all from `braces`, the GHSA-vfj7-8cjw-p6xm DoS via deeply nested glob patterns. It reaches us through `eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch`. Since no patched `braces` release exists (3.0.3 is the latest), no safe update can resolve it.
+- **Why it wasn't fixed:** `npm audit fix --force` would downgrade `eslint-config-next` to 14.x, so it was not used. The package is dev-only lint tooling that only ever processes this repository's own glob patterns, and it is not part of the built app.
+- **Revisit:** when a patched release or an updated `eslint-config-next` ships.
+
 ### Known limitations
 
 - The demo dataset is pinned to a fixed date. The "Updated Xs ago" freshness values are synthetic and tick forward from that fixed point.
-- `npm audit` reports high-severity advisories in `braces`/`micromatch`. They come from the lint toolchain (`eslint-config-next`), are dev-only and are not part of the shipped app. The suggested "fix" downgrades to Next 14 tooling, so it was not applied.
 
 ---
 

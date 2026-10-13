@@ -9,7 +9,7 @@ import { GlobalSearch } from "./GlobalSearch";
 
 interface TopNavProps {
   searchIndex: SearchEntry[];
-  feedMeta: DatasetMeta;
+  feedMeta?: DatasetMeta;
   onOpenMenu: () => void;
 }
 
@@ -23,7 +23,11 @@ export function TopNav({ searchIndex, feedMeta, onOpenMenu }: TopNavProps) {
       <GlobalSearch index={searchIndex} />
 
       <div className="ml-auto flex items-center gap-3">
-        <FreshnessIndicator meta={feedMeta} label="Odds feed" className="hidden md:inline-flex" />
+        {feedMeta ? (
+          <FreshnessIndicator meta={feedMeta} label="Odds feed" className="hidden md:inline-flex" />
+        ) : (
+          <span className="hidden text-[11px] text-neg md:inline">Odds feed unavailable</span>
+        )}
         <span className="hidden h-5 w-px bg-line md:block" aria-hidden />
         <button type="button" className="relative rounded p-1.5 text-ink-3 hover:bg-surface-2 hover:text-ink" aria-label="Alerts (not available in Phase 1)" title="Alerts arrive in a later phase">
           <Bell className="size-4" />
